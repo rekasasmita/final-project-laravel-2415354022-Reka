@@ -11,17 +11,18 @@ class SubscriptionController
 {
     public function index(): JsonResponse
     {
-        // Mengambil data subscription sekalian dengan data user dan service-nya
-        $subscriptions = Subscription::with(['user', 'service'])->latest()->get();
+        $subscriptions = Subscription::with(['customer', 'service'])->latest()->get();
         return response()->json(["success" => true, "message" => "Subscriptions retrieved", "data" => $subscriptions]);
     }
 
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            "user_id" => ["required", "integer", "exists:users,id"],
+            "customer_id" => ["required", "integer", "exists:customers,id"],
             "service_id" => ["required", "integer", "exists:services,id"],
-            "status" => ["nullable", "string", "in:active,expired,cancelled"],
+            "start_date" => ["nullable", "date"],
+            "end_date" => ["nullable", "date", "after_or_equal:start_date"],
+            "status" => ["required", "string", "in:active,inactive,trial,isolir,dismantle"],
         ]);
 
         $subscription = Subscription::query()->create($data);
@@ -31,10 +32,10 @@ class SubscriptionController
 
     public function show(int $subscription): JsonResponse
     {
-        $subscription = Subscription::with(['user', 'service'])->find($subscription);
-        if (!$subscription) return response()->json(["success" => false, "message" => "Subscription not found"], 404);
+        $subscriptionModel = Subscription::with(['customer', 'service'])->find($subscription);
+        if (!$subscriptionModel) return response()->json(["success" => false, "message" => "Subscription not found"], 404);
 
-        return response()->json(["success" => true, "message" => "Subscription retrieved", "data" => $subscription]);
+        return response()->json(["success" => true, "message" => "Subscription retrieved", "data" => $subscriptionModel]);
     }
 
     public function update(Request $request, int $subscription): JsonResponse
@@ -43,7 +44,9 @@ class SubscriptionController
         if (!$subModel) return response()->json(["success" => false, "message" => "Subscription not found"], 404);
 
         $data = $request->validate([
-            "status" => ["required", "string", "in:active,expired,cancelled"],
+            "start_date" => ["nullable", "date"],
+            "end_date" => ["nullable", "date", "after_or_equal:start_date"],
+            "status" => ["sometimes", "string", "in:active,inactive,trial,isolir,dismantle"],
         ]);
 
         $subModel->update($data);
