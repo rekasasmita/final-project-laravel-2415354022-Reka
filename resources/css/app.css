@@ -9,3 +9,16 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+.sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-200;
+}
+
+.sidebar-link.active {
+    @apply bg-slate-800 text-white shadow-lg;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+

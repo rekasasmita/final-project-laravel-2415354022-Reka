@@ -40,7 +40,7 @@ class CustomerController
         return response()->json(["success" => true, "message" => "Customer retrieved", "data" => $customer]);
     }
 
-    public function update(Request $request, int $customer): JsonResponse
+    public function update(Request $request, $customer): JsonResponse
     {
         $customerModel = Customer::query()->find($customer);
         if (!$customerModel) return response()->json(["success" => false, "message" => "Customer not found"], 404);
@@ -58,7 +58,7 @@ class CustomerController
         return response()->json(["success" => true, "message" => "Customer updated", "data" => $customerModel]);
     }
 
-    public function destroy(int $customer): JsonResponse
+    public function destroy($customer): JsonResponse
     {
         $customerModel = Customer::query()->find($customer);
         if (!$customerModel) return response()->json(["success" => false, "message" => "Customer not found"], 404);

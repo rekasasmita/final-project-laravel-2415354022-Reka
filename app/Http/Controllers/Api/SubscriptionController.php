@@ -38,7 +38,7 @@ class SubscriptionController
         return response()->json(["success" => true, "message" => "Subscription retrieved", "data" => $subscriptionModel]);
     }
 
-    public function update(Request $request, int $subscription): JsonResponse
+    public function update(Request $request, $subscription): JsonResponse
     {
         $subModel = Subscription::query()->find($subscription);
         if (!$subModel) return response()->json(["success" => false, "message" => "Subscription not found"], 404);
@@ -49,8 +49,22 @@ class SubscriptionController
             "status" => ["sometimes", "string", "in:active,inactive,trial,isolir,dismantle"],
         ]);
 
-        $subModel->update($data);
-        return response()->json(["success" => true, "message" => "Subscription updated", "data" => $subModel]);
+        if ($subscription->status === 'dismantle') {
+        return response()->json([
+            'success' => false,
+            'message' => 'Dismantled subscription cannot be changed'
+        ], 422);
+    }
+
+    $subscription->update($request->all());
+
+    return response()->json([
+        'success' => true,
+        'data' => $subscription
+    ]);
+    $subModel->update($data);
+    return response()->json(["success" => true, "message" => "Subscription updated", "data" => $subModel]);
+
     }
 
     public function destroy(int $subscription): JsonResponse
